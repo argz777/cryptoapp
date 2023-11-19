@@ -3,6 +3,7 @@
 package com.example.cryptoapp.pages.portfolio
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,10 +12,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,11 +39,13 @@ import co.yml.charts.ui.piechart.models.PieChartData
 import com.example.cryptoapp.MainViewModel
 import com.example.cryptoapp.model.PortfolioCoin
 import com.example.cryptoapp.pages.portfolio.components.AddCoinDialog
+import com.example.cryptoapp.pages.portfolio.components.DeleteCoinDialog
 import com.example.cryptoapp.pages.portfolio.components.PortfolioCoinContent
 import com.example.cryptoapp.pages.portfolio.components.UpdateCoinDialog
 import com.example.cryptoapp.utils.getFraction
 import com.example.cryptoapp.utils.getRandomColor
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PortfolioPage(
     navController: NavController,
@@ -45,7 +53,8 @@ fun PortfolioPage(
 ) {
     val showAddCoinDialog = remember { mutableStateOf(false) }
     val showUpdateCoinDialog = remember { mutableStateOf(false) }
-    val portfolioCoins by mainViewModel.portfolioCoins.collectAsState()
+    val showDeleteCoinDialog = remember { mutableStateOf(false) }
+    val portfolioCoins = mainViewModel.portfolioCoins
 
     if(showAddCoinDialog.value){
         AddCoinDialog(
@@ -61,7 +70,24 @@ fun PortfolioPage(
         )
     }
 
+    if(showDeleteCoinDialog.value){
+        DeleteCoinDialog(
+            showDeleteCoinDialog = showDeleteCoinDialog,
+            mainViewModel = mainViewModel,
+        )
+    }
+
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, "")
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -88,10 +114,15 @@ fun PortfolioPage(
                     portfolioCoins.forEach {
                         item(key = it.coin!!.id) {
                             PortfolioCoinContent(
+                                modifier = Modifier.animateItemPlacement(),
                                 portfolioCoin = it,
                                 onClick = {
                                     mainViewModel.selectedCoin = it
                                     showUpdateCoinDialog.value = true
+                                },
+                                onLongClick = {
+                                    mainViewModel.selectedCoin = it
+                                    showDeleteCoinDialog.value = true
                                 }
                             )
                         }
@@ -107,16 +138,12 @@ private const val TAG = "PortfolioPage"
 fun PortfolioChart(
     portfolioCoins: SnapshotStateList<PortfolioCoin>
 ){
-    portfolioCoins.map {
-        Log.d(TAG, "PortfolioChart: ${it.coin!!.name} = ${getFraction(portfolioCoins, it)}")
-    }
-    Log.d(TAG, "PortfolioChart: ------------")
     val chartData = PieChartData(
         slices = portfolioCoins.map { it
             PieChartData.Slice(
-                label = "${it.coin!!.name}(${it.coin!!.symbol})",
+                label = "${it.coin!!.symbol}",
                 value = getFraction(portfolioCoins, it),
-                color = getRandomColor(),
+                color = Color(it.color),
             )
         },
         plotType = PlotType.Donut,
@@ -136,6 +163,6 @@ fun PortfolioChart(
             .height(300.dp)
             .padding(16.dp),
         chartData,
-        config
+        config,
     )
 }

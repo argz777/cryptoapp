@@ -29,6 +29,7 @@ fun CustomAlertDialog(
     title: String,
     onConfirm: () -> Unit,
     onConfirmText: String,
+    enabled: Boolean = true,
     expanded: MutableState<Boolean>,
     selectedOption: MutableState<Coin>,
     quantity: MutableState<Int>,
@@ -46,7 +47,8 @@ fun CustomAlertDialog(
                 ExposedDropdownMenuBox(
                     expanded = expanded.value,
                     onExpandedChange = {
-                        expanded.value = !expanded.value
+                        if(!enabled) expanded.value = false
+                        else expanded.value = !expanded.value
                     }
                 ) {
                     TextField(
@@ -82,6 +84,7 @@ fun CustomAlertDialog(
                 }
 
                 TextField(
+                    readOnly = !enabled,
                     value = quantity.value.toString(),
                     onValueChange = {
                         if(it.isEmpty()) {

@@ -13,6 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.cryptoapp.MainViewModel
 import com.example.cryptoapp.model.PortfolioCoin
+import com.example.cryptoapp.model.Resource
+import com.example.cryptoapp.utils.getRandomColor
+import com.example.cryptoapp.utils.getRandomLong
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,7 +26,7 @@ fun AddCoinDialog(
 ){
     val coins by mainViewModel.coins.collectAsState()
     var expanded = remember { mutableStateOf(false) }
-    val selectedOption = remember { mutableStateOf(coins[0]) }
+    val selectedOption = remember { mutableStateOf((coins as Resource.Success).result[0]) }
     var quantity = remember { mutableIntStateOf(0) }
 
     CustomAlertDialog(
@@ -34,6 +37,7 @@ fun AddCoinDialog(
         onConfirm = {
             mainViewModel.addCoin(
                 PortfolioCoin(
+                    color = getRandomLong(),
                     quantity = quantity.value,
                     coin = selectedOption.value,
                 )
@@ -43,7 +47,7 @@ fun AddCoinDialog(
         expanded = expanded,
         selectedOption = selectedOption,
         quantity = quantity,
-        coins = coins,
+        coins = (coins as Resource.Success).result,
     )
 }
 

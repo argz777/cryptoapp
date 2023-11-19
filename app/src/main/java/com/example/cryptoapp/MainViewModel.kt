@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cryptoapp.model.Coin
 import com.example.cryptoapp.model.PortfolioCoin
+import com.example.cryptoapp.model.Resource
 import com.example.cryptoapp.network.ApiService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
@@ -32,17 +34,24 @@ class MainViewModel @Inject constructor(
 ): ViewModel() {
     private lateinit var path: CollectionReference
     private lateinit var user: String
-    private val _coins: MutableStateFlow<List<Coin>> = MutableStateFlow(emptyList())
-    private val _portfolioCoins = MutableStateFlow<SnapshotStateList<PortfolioCoin>>(mutableStateListOf())
+    private val _coins: MutableStateFlow<Resource<List<Coin>>> = MutableStateFlow(Resource.Loading)
+    val portfolioCoins = mutableStateListOf<PortfolioCoin>()
 
     val coins = _coins.asStateFlow()
-    val portfolioCoins = _portfolioCoins.asStateFlow()
     var selectedCoin: PortfolioCoin? = null
 
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO){
-                async { _coins.value = apiService.getCoins().data }
+                async {
+                    delay(3000)
+                    try {
+                        val response = apiService.getCoins().data
+                        _coins.value = Resource.Success(response)
+                    } catch (e : Exception) {
+                        _coins.value = Resource.Failure(e)
+                    }
+                }
                 async {
                     firebaseAuth.signInWithEmailAndPassword("test@test.com", "123456").await()
                     user = firebaseAuth.currentUser!!.uid
@@ -57,10 +66,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 path.document(portfolioCoin.coin!!.id!!).set(portfolioCoin).await()
-                _portfolioCoins.update {
-                    it.add(portfolioCoin)
-                    it
-                }
+                portfolioCoins.add(portfolioCoin)
             }
         }
     }
@@ -69,29 +75,30 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val dbCoins = path.get().await()
+                portfolioCoins.addAll(dbCoins.toObjects(PortfolioCoin::class.java))
+            }
+        }
+    }
 
-                dbCoins.forEach { coin ->
-                    _portfolioCoins.update {
-                        it.add(coin.toObject(PortfolioCoin::class.java))
-                        it
-                    }
-                }
+    fun deleteCoin(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                path.document(selectedCoin!!.coin!!.id!!).delete().await()
+                portfolioCoins.remove(selectedCoin)
             }
         }
     }
 
     fun updateCoin(
-        portfolioCoin: PortfolioCoin
+        portfolioCoin: PortfolioCoin,
+        newQuantity: Int,
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 path.document(portfolioCoin.coin!!.id!!).set(portfolioCoin).await()
-                _portfolioCoins.update {
-                    it.find { it.coin!!.id == portfolioCoin.coin!!.id }.let { currentCoin ->
-                        currentCoin!!.quantity = portfolioCoin.quantity
-                    }
-                    it
-                }
+                portfolioCoins[portfolioCoins.indexOf(portfolioCoin)] = portfolioCoin.copy(
+                    quantity = newQuantity
+                )
             }
         }
     }

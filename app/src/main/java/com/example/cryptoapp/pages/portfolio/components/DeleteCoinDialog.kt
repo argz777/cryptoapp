@@ -1,7 +1,7 @@
 package com.example.cryptoapp.pages.portfolio.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -14,8 +14,8 @@ import com.example.cryptoapp.model.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpdateCoinDialog(
-    showUpdateCoinDialog: MutableState<Boolean>,
+fun DeleteCoinDialog(
+    showDeleteCoinDialog: MutableState<Boolean>,
     mainViewModel: MainViewModel,
 ){
     val coins by mainViewModel.coins.collectAsState()
@@ -24,17 +24,15 @@ fun UpdateCoinDialog(
     var quantity = remember { mutableStateOf(mainViewModel.selectedCoin!!.quantity) }
 
     CustomAlertDialog(
-        flag = showUpdateCoinDialog,
-        icon = Icons.Filled.Edit,
-        title = "Update Coin",
-        onConfirmText = "Update",
+        flag = showDeleteCoinDialog,
+        icon = Icons.Filled.Delete,
+        title = "Delete a Coin",
+        onConfirmText = "Delete",
         onConfirm = {
-            mainViewModel.updateCoin(
-                portfolioCoin = mainViewModel.selectedCoin!!,
-                newQuantity = quantity.value,
-            )
-            showUpdateCoinDialog.value = false
+            mainViewModel.deleteCoin()
+            showDeleteCoinDialog.value = false
         },
+        enabled = false,
         expanded = expanded,
         selectedOption = selectedOption,
         quantity = quantity,
