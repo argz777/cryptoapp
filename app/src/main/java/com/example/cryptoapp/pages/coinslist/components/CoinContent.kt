@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.cryptoapp.model.Coin
 import com.example.cryptoapp.ui.theme.CryptoappTheme
 import java.text.DecimalFormat
@@ -34,6 +36,11 @@ fun CoinContent(
             modifier = Modifier.padding(8.dp),
             textAlign = TextAlign.Center,
             text = "${coin.rank}")
+        AsyncImage(
+            modifier = Modifier.size(40.dp).padding(4.dp),
+            model = "https://assets.coincap.io/assets/icons/${coin.symbol!!.lowercase()}@2x.png",
+            contentDescription = null,
+        )
         Text(
             modifier = Modifier.padding(8.dp),
             textAlign = TextAlign.Center,
