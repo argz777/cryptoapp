@@ -16,6 +16,7 @@ import com.example.cryptoapp.utils.toMap
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -176,11 +177,17 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun deleteCoin(){
+    fun deleteCoin(portfolioCoin: PortfolioCoin){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 path.document(selectedCoin!!.coin!!.id!!).delete().await()
-                _portfolioCoins.value.remove(selectedCoin)
+
+                for(n in _portfolioCoins.value.indices){
+                    if(portfolioCoin.coin!!.id == _portfolioCoins.value[n].coin!!.id){
+                        _portfolioCoins.value.removeAt(n)
+                        break
+                    }
+                }
             }
         }
     }
@@ -191,7 +198,7 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                path.document(portfolioCoin.coin!!.id!!).set(portfolioCoin).await()
+                path.document(portfolioCoin.coin!!.id!!).set(hashMapOf("quantity" to newQuantity.toString()), SetOptions.merge())
 
                 for(n in _portfolioCoins.value.indices){
                     if(portfolioCoin.coin!!.id == _portfolioCoins.value[n].coin!!.id){

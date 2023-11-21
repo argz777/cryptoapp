@@ -31,12 +31,20 @@ fun CoinsListPage(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.PortfolioScreen.route)
-                },
-            ) {
-                Icon(Icons.Filled.List, "Portfolio")
+            coins.value.let { res ->
+                when(res) {
+                    is Resource.Failure -> {}
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        FloatingActionButton(
+                            onClick = {
+                                navController.navigate(Screen.PortfolioScreen.route)
+                            },
+                        ) {
+                            Icon(Icons.Filled.List, "Portfolio")
+                        }
+                    }
+                }
             }
         }
     ) {
