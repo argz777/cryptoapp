@@ -198,7 +198,7 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                path.document(portfolioCoin.coin!!.id!!).set(hashMapOf("quantity" to newQuantity.toString()), SetOptions.merge())
+                path.document(portfolioCoin.coin!!.id!!).set(hashMapOf("quantity" to newQuantity), SetOptions.merge())
 
                 for(n in _portfolioCoins.value.indices){
                     if(portfolioCoin.coin!!.id == _portfolioCoins.value[n].coin!!.id){
