@@ -1,5 +1,14 @@
 package com.example.cryptoapp.pages.coinslist.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +30,7 @@ import com.example.cryptoapp.model.Coin
 import com.example.cryptoapp.ui.theme.CryptoappTheme
 import java.text.DecimalFormat
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CoinContent(
     coin: Coin
@@ -50,12 +60,26 @@ fun CoinContent(
                 .weight(1f)
                 .padding(8.dp),
             text = "${coin.name}")
-        Text(
-            modifier = Modifier
-                .padding(8.dp),
-            textAlign = TextAlign.End,
-            text = "$" + DecimalFormat("#,###.00").format(coin.priceUsd!!.toDouble()))
+        AnimatedContent(
+            targetState = coin.priceUsd,
+            transitionSpec = { addTimeAnimation() }, label = ""
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(8.dp),
+                textAlign = TextAlign.End,
+                text = "$" + DecimalFormat("#,###.0000").format(it!!.toDouble()))
+        }
     }
+}
+
+@ExperimentalAnimationApi
+fun addTimeAnimation(duration: Int = 600): ContentTransform {
+    return slideInVertically(animationSpec = tween(durationMillis = duration)) { height -> height } + fadeIn(
+        animationSpec = tween(durationMillis = duration)
+    ) togetherWith slideOutVertically(animationSpec = tween(durationMillis = duration)) { height -> -height } + fadeOut(
+        animationSpec = tween(durationMillis = duration)
+    )
 }
 
 @Composable

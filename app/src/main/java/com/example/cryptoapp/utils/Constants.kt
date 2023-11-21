@@ -8,6 +8,7 @@ import kotlin.math.roundToInt
 class Constants {
     companion object {
         val BASE_URL = "https://api.coincap.io/"
+        val WEB_SOCKET_BASE_URL = "wss://ws.coincap.io/prices?assets=bitcoin,ethereum,monero,litecoin,ripple,binance-coin,tether,dogecoin,tron,usd-coin"
     }
 }
 

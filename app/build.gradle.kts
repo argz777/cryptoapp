@@ -105,4 +105,7 @@ dependencies {
 
     // Charts
     implementation("co.yml:ycharts:2.1.0")
+
+    // Websockets
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 }
