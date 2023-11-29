@@ -26,38 +26,11 @@ import javax.inject.Inject
 
 private const val TAG = "MainViewModel"
 
-@HiltViewModel
-class MainViewModel @Inject constructor(
-    private val apiService: ApiService,
-    private val firestore: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth,
-): ViewModel() {
-    private lateinit var path: CollectionReference
-    private lateinit var user: String
-    private val _coins: MutableStateFlow<Resource<List<Coin>>> = MutableStateFlow(Resource.Loading)
-    val portfolioCoins = mutableStateListOf<PortfolioCoin>()
-
-    val coins = _coins.asStateFlow()
-    var selectedCoin: PortfolioCoin? = null
-
+class MainViewModel: ViewModel() {
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO){
-                async {
-                    delay(3000)
-                    try {
-                        val response = apiService.getCoins().data
-                        _coins.value = Resource.Success(response)
-                    } catch (e : Exception) {
-                        _coins.value = Resource.Failure(e)
-                    }
-                }
-                async {
-                    firebaseAuth.signInWithEmailAndPassword("test@test.com", "123456").await()
-                    user = firebaseAuth.currentUser!!.uid
-                    path = firestore.collection("users/$user/coins/")
-                    getCoins()
-                }
+
             }
         }
     }
@@ -65,8 +38,7 @@ class MainViewModel @Inject constructor(
     fun addCoin(portfolioCoin: PortfolioCoin) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                path.document(portfolioCoin.coin!!.id!!).set(portfolioCoin).await()
-                portfolioCoins.add(portfolioCoin)
+
             }
         }
     }
@@ -74,8 +46,7 @@ class MainViewModel @Inject constructor(
     fun getCoins(){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val dbCoins = path.get().await()
-                portfolioCoins.addAll(dbCoins.toObjects(PortfolioCoin::class.java))
+
             }
         }
     }
@@ -83,8 +54,7 @@ class MainViewModel @Inject constructor(
     fun deleteCoin(){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                path.document(selectedCoin!!.coin!!.id!!).delete().await()
-                portfolioCoins.remove(selectedCoin)
+
             }
         }
     }
@@ -95,10 +65,7 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                path.document(portfolioCoin.coin!!.id!!).set(portfolioCoin).await()
-                portfolioCoins[portfolioCoins.indexOf(portfolioCoin)] = portfolioCoin.copy(
-                    quantity = newQuantity
-                )
+
             }
         }
     }
