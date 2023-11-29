@@ -1,5 +1,7 @@
 package com.example.cryptoapp.pages.portfolio.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,12 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cryptoapp.model.Coin
 import com.example.cryptoapp.model.PortfolioCoin
+import com.example.cryptoapp.pages.coinslist.components.addTimeAnimation
 import com.example.cryptoapp.ui.theme.CryptoappTheme
 import com.example.cryptoapp.utils.getRandomLong
 import java.text.DecimalFormat
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun PortfolioCoinContent(
     modifier: Modifier = Modifier,
@@ -65,12 +68,19 @@ fun PortfolioCoinContent(
             modifier = Modifier.padding(8.dp),
             textAlign = TextAlign.Start,
             text = "${portfolioCoin.coin!!.name}(${portfolioCoin.coin!!.symbol})\n${portfolioCoin.quantity} ${portfolioCoin.coin!!.symbol!!.uppercase()}")
-        Text(
+        AnimatedContent(
+            targetState = portfolioCoin,
+            transitionSpec = { addTimeAnimation() }, label = "",
             modifier = Modifier
-                .padding(8.dp)
-                .weight(1f),
-            textAlign = TextAlign.End,
-            text = "$" + DecimalFormat("#,###.00").format(portfolioCoin.coin!!.priceUsd!!.toDouble() * portfolioCoin.quantity))
+                .weight(1f)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f),
+                textAlign = TextAlign.End,
+                text = "$" + DecimalFormat("#,###.00").format(it.coin!!.priceUsd!!.toDouble() * it.quantity))
+        }
     }
 }
 

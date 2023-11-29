@@ -1,6 +1,7 @@
 package com.example.cryptoapp.di
 
 import com.example.cryptoapp.network.ApiService
+import com.example.cryptoapp.network.CustomWebSocketListener
 import com.example.cryptoapp.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -13,6 +14,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

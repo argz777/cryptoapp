@@ -29,7 +29,7 @@ fun DeleteCoinDialog(
         title = "Delete a Coin",
         onConfirmText = "Delete",
         onConfirm = {
-            mainViewModel.deleteCoin()
+            mainViewModel.deleteCoin(mainViewModel.selectedCoin!!)
             showDeleteCoinDialog.value = false
         },
         enabled = false,
