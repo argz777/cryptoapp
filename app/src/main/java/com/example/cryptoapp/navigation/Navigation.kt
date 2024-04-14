@@ -13,26 +13,5 @@ import com.example.cryptoapp.pages.portfolio.PortfolioPage
 
 @Composable
 fun Navigation() {
-    val navigationController = rememberNavController()
 
-    NavHost(
-        navController = navigationController,
-        startDestination = Screen.CoinsListScreen.route,
-        route = MAIN_GRAPH_ROUTE
-    ) {
-        composable(Screen.CoinsListScreen.route){
-            val parent = remember(it){
-                navigationController.getBackStackEntry(MAIN_GRAPH_ROUTE)
-            }
-            val mainViewModel = hiltViewModel<MainViewModel>(parent)
-            CoinsListPage(navController = navigationController, mainViewModel = mainViewModel)
-        }
-        composable(Screen.PortfolioScreen.route){
-            val parent = remember(it){
-                navigationController.getBackStackEntry(MAIN_GRAPH_ROUTE)
-            }
-            val mainViewModel = hiltViewModel<MainViewModel>(parent)
-            PortfolioPage(navController = navigationController, mainViewModel = mainViewModel)
-        }
-    }
 }
