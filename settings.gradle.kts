@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "cryptoapp"
-include(":app")
+include(":composeApp")
  
