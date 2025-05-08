@@ -32,12 +32,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import co.yml.charts.common.extensions.isNotNull
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
 import com.example.cryptoapp.MainViewModel
+import com.example.cryptoapp.model.Coin
 import com.example.cryptoapp.model.PortfolioCoin
+import com.example.cryptoapp.model.Resource
 import com.example.cryptoapp.pages.portfolio.components.AddCoinDialog
 import com.example.cryptoapp.pages.portfolio.components.DeleteCoinDialog
 import com.example.cryptoapp.pages.portfolio.components.PortfolioCoinContent
@@ -54,7 +57,7 @@ fun PortfolioPage(
     val showAddCoinDialog = remember { mutableStateOf(false) }
     val showUpdateCoinDialog = remember { mutableStateOf(false) }
     val showDeleteCoinDialog = remember { mutableStateOf(false) }
-    val portfolioCoins = mainViewModel.portfolioCoins
+    val portfolioCoins = mainViewModel.portfolioCoins.collectAsState()
 
     if(showAddCoinDialog.value){
         AddCoinDialog(
@@ -102,16 +105,16 @@ fun PortfolioPage(
             modifier = Modifier.padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if(portfolioCoins.isNotEmpty()){
+            if(portfolioCoins.value.isNotNull()){
                 PortfolioChart(
-                    portfolioCoins
+                    portfolioCoins.value,
                 )
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
-                    portfolioCoins.forEach {
+                    portfolioCoins.value.forEach {
                         item(key = it.coin!!.id) {
                             PortfolioCoinContent(
                                 modifier = Modifier.animateItemPlacement(),
@@ -136,7 +139,7 @@ fun PortfolioPage(
 private const val TAG = "PortfolioPage"
 @Composable
 fun PortfolioChart(
-    portfolioCoins: SnapshotStateList<PortfolioCoin>
+    portfolioCoins: SnapshotStateList<PortfolioCoin>,
 ){
     val chartData = PieChartData(
         slices = portfolioCoins.map { it
