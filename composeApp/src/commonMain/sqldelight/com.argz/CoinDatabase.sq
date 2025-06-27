@@ -1,0 +1,68 @@
+CREATE TABLE CoinTable (
+    id TEXT NOT NULL,
+    rank TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    name TEXT NOT NULL,
+    supply TEXT NOT NULL,
+    maxSupply TEXT NOT NULL,
+    marketCapUsd TEXT NOT NULL,
+    volumeUsd24Hr TEXT NOT NULL,
+    priceUsd TEXT NOT NULL,
+    changePercent24Hr TEXT NOT NULL,
+    vwap24Hr TEXT NOT NULL
+);
+
+readAllCoins:
+SELECT CoinTable.*
+FROM CoinTable;
+
+readCoin:
+SELECT * FROM CoinTable WHERE id = ?;
+
+insertCoin:
+INSERT INTO CoinTable(id, rank, symbol, name, supply, maxSupply, marketCapUsd, volumeUsd24Hr, priceUsd, changePercent24Hr
+, vwap24Hr)
+VALUES (?, ?, ?,?,?,?,?,?,?,?,?);
+
+removeCoin:
+DELETE FROM CoinTable WHERE id = ?;
+
+removeAllCoins:
+DELETE FROM CoinTable;
+
+CREATE TABLE TransactionTable (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    coinId TEXT NOT NULL,
+    rank TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    name TEXT NOT NULL,
+    supply TEXT NOT NULL,
+    maxSupply TEXT NOT NULL,
+    marketCapUsd TEXT NOT NULL,
+    volumeUsd24Hr TEXT NOT NULL,
+    priceUsd TEXT NOT NULL,
+    changePercent24Hr TEXT NOT NULL,
+    vwap24Hr TEXT NOT NULL,
+    action TEXT NOT NULL,
+    quantity TEXT NOT NULL,
+    price TEXT NOT NULL,
+    transactionDate TEXT NOT NULL
+);
+
+readAllTransactions:
+SELECT TransactionTable.*
+FROM TransactionTable;
+
+readAllTransactionsOfCoin:
+SELECT * FROM TransactionTable WHERE symbol = ?;
+
+insertTransaction:
+INSERT INTO TransactionTable(coinId, rank, symbol, name, supply, maxSupply, marketCapUsd, volumeUsd24Hr, priceUsd, changePercent24Hr
+, vwap24Hr, action, quantity, price, transactionDate)
+VALUES (?, ?,?, ?, ?, ?, ?,?,?,?,?,?,?,?, ?);
+
+removeTransaction:
+DELETE FROM TransactionTable WHERE id = ?;
+
+removeAllTransactions:
+DELETE FROM TransactionTable;
